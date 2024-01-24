@@ -12,66 +12,73 @@ const express = require("express");
 const app = express();
 app.use(express.json());
 
-const getTableContent = async (tableName) => {
-    const { rows } = await pool.query(`SELECT * FROM public.${tableName}`);
-    return rows;
-};
-
-app.get("/doctors", async (req, res) => {
+app.get("/api/doctors", async (req, res) => {
     try {
-        const doctors = await getTableContent("doctor");
-        res.json(doctors);
+        const { rows } = await pool.query(
+            `SELECT * FROM public.doctor ORDER BY full_name ASC`
+        );
+        res.json(rows);
     } catch (error) {
         console.error(error);
     }
 });
 
-app.get("/patients", async (req, res) => {
+app.get("/api/patients", async (req, res) => {
     try {
-        const patients = await getTableContent("patient");
-        res.json(patients);
+        const { rows } = await pool.query(
+            `SELECT * FROM public.patient ORDER BY full_name ASC`
+        );
+        res.json(rows);
     } catch (error) {
         console.error(error);
     }
 });
 
-app.get("/rooms", async (req, res) => {
+app.get("/api/rooms", async (req, res) => {
     try {
-        const rooms = await getTableContent("room");
-        res.json(rooms);
+        const { rows } = await pool.query(
+            `SELECT * FROM public.room ORDER BY number ASC`
+        );
+        res.json(rows);
     } catch (error) {
         console.error(error);
     }
 });
 
-app.get("/visits", async (req, res) => {
+app.get("/api/visits", async (req, res) => {
     try {
-        const visits = await getTableContent("visit");
-        res.json(visits);
+        const { rows } = await pool.query(
+            `SELECT * FROM public.visit ORDER BY visit_date, patient_passport ASC`
+        );
+        res.json(rows);
     } catch (error) {
         console.error(error);
     }
 });
 
-app.get("/services", async (req, res) => {
+app.get("/api/services", async (req, res) => {
     try {
-        const services = await getTableContent("service");
-        res.json(services);
+        const { rows } = await pool.query(
+            `SELECT * FROM public.service ORDER BY name ASC`
+        );
+        res.json(rows);
     } catch (error) {
         console.error(error);
     }
 });
 
-app.get("/service-lists", async (req, res) => {
+app.get("/api/service-lists", async (req, res) => {
     try {
-        const servicesLists = await getTableContent("service_list");
-        res.json(servicesLists);
+        const { rows } = await pool.query(
+            `SELECT * FROM public.service_list ORDER BY visit_date, patient_passport ASC`
+        );
+        res.json(rows);
     } catch (error) {
         console.error(error);
     }
 });
 
-app.get("/doctor-by-name", async (req, res) => {
+app.get("/api/doctor-by-name", async (req, res) => {
     const doctor_name = req.query.name;
     try {
         const { rows } = await pool.query(
@@ -83,7 +90,7 @@ app.get("/doctor-by-name", async (req, res) => {
     }
 });
 
-app.get("/patient-by-name", async (req, res) => {
+app.get("/api/patient-by-name", async (req, res) => {
     const patient_name = req.query.name;
     try {
         const { rows } = await pool.query(
@@ -95,7 +102,7 @@ app.get("/patient-by-name", async (req, res) => {
     }
 });
 
-app.get("/room-by-number", async (req, res) => {
+app.get("/api/room-by-number", async (req, res) => {
     const room_number = Number(req.query.number);
     try {
         const { rows } = await pool.query(
@@ -107,7 +114,7 @@ app.get("/room-by-number", async (req, res) => {
     }
 });
 
-app.get("/room-by-number", async (req, res) => {
+app.get("/api/room-by-number", async (req, res) => {
     const room_number = Number(req.query.number);
     try {
         const { rows } = await pool.query(
@@ -119,7 +126,7 @@ app.get("/room-by-number", async (req, res) => {
     }
 });
 
-app.get("/visit-by-date", async (req, res) => {
+app.get("/api/visit-by-date", async (req, res) => {
     const visit_date = req.query.date;
     try {
         const { rows } = await pool.query(
@@ -131,7 +138,7 @@ app.get("/visit-by-date", async (req, res) => {
     }
 });
 
-app.get("/service-list-by-visit", async (req, res) => {
+app.get("/api/service-list-by-visit", async (req, res) => {
     const visit_date = req.query.date;
     const patient_passport = req.query.passport;
     try {
@@ -144,7 +151,7 @@ app.get("/service-list-by-visit", async (req, res) => {
     }
 });
 
-app.post("/add-doctor", async (req, res) => {
+app.post("/api/add-doctor", async (req, res) => {
     const {
         full_name,
         sex,
@@ -160,10 +167,11 @@ app.post("/add-doctor", async (req, res) => {
         res.send("Doctor created");
     } catch (error) {
         console.error(error);
+        res.status(500).send("Ошибка");
     }
 });
 
-app.post("/add-patient", async (req, res) => {
+app.post("/api/add-patient", async (req, res) => {
     const { full_name, birthday, sex, phone_number, passport, snils } =
         req.body;
     try {
@@ -173,10 +181,11 @@ app.post("/add-patient", async (req, res) => {
         res.send("Patient created");
     } catch (error) {
         console.error(error);
+        res.status(500).send("Ошибка");
     }
 });
 
-app.post("/add-room", async (req, res) => {
+app.post("/api/add-room", async (req, res) => {
     const { number, floor_number, features } = req.body;
     try {
         await pool.query(
@@ -185,10 +194,11 @@ app.post("/add-room", async (req, res) => {
         res.send("Room created");
     } catch (error) {
         console.error(error);
+        res.status(500).send("Ошибка");
     }
 });
 
-app.post("/add-service", async (req, res) => {
+app.post("/api/add-service", async (req, res) => {
     const { name, description, price } = req.body;
     try {
         const result = await pool.query(
@@ -198,10 +208,11 @@ app.post("/add-service", async (req, res) => {
         res.send("Service created");
     } catch (error) {
         console.error(error);
+        res.status(500).send("Ошибка");
     }
 });
 
-app.post("/add-visit", async (req, res) => {
+app.post("/api/add-visit", async (req, res) => {
     const {
         visit_date,
         duration_in_minutes,
@@ -210,17 +221,18 @@ app.post("/add-visit", async (req, res) => {
         room_number,
     } = req.body;
     try {
-        const result = await pool.query(
+        await pool.query(
             `INSERT INTO public.visit values ('${visit_date}', ${duration_in_minutes}, '${patient_passport}', '${doctor_name}', ${room_number})`
         );
-        console.log(result);
+
         res.send("Visit created");
     } catch (error) {
         console.error(error);
+        res.status(500).send("Ошибка");
     }
 });
 
-app.post("/add-service-list", async (req, res) => {
+app.post("/api/add-service-list", async (req, res) => {
     const {
         visit_date,
         patient_passport,
@@ -236,10 +248,11 @@ app.post("/add-service-list", async (req, res) => {
         res.send("Service_list created");
     } catch (error) {
         console.error(error);
+        res.status(500).send("Ошибка");
     }
 });
 
-app.delete("/visit", async (req, res) => {
+app.delete("/api/visit", async (req, res) => {
     const { visit_date, passport } = req.query;
     try {
         const result = await pool.query(
@@ -252,7 +265,7 @@ app.delete("/visit", async (req, res) => {
     }
 });
 
-app.delete("/patient", async (req, res) => {
+app.delete("/api/patient", async (req, res) => {
     const { passport } = req.query;
     try {
         const result = await pool.query(
@@ -265,7 +278,7 @@ app.delete("/patient", async (req, res) => {
     }
 });
 
-app.patch("/doctor", async (req, res) => {
+app.patch("/api/doctor", async (req, res) => {
     const full_name = req.query.name;
     const { profile, category, phone_number, experience_years } = req.body;
 
@@ -273,9 +286,13 @@ app.patch("/doctor", async (req, res) => {
         const result = await pool.query(
             `UPDATE public.doctor SET
             ${profile ? `profile = '${profile}'` : ""}
-            ${category ? `category = '${category}'` : ""}
-            ${phone_number ? `phone_number = '${phone_number}'` : ""}
-            ${experience_years ? `experience_years = ${experience_years}` : ""}
+            ${category ? `, category = '${category}'` : ""}
+            ${phone_number ? `, phone_number = '${phone_number}'` : ""}
+            ${
+                experience_years
+                    ? `, experience_years = ${experience_years}`
+                    : ""
+            }
             WHERE full_name = '${full_name}'`
         );
         console.log(result);
@@ -285,7 +302,7 @@ app.patch("/doctor", async (req, res) => {
     }
 });
 
-app.patch("/patient", async (req, res) => {
+app.patch("/api/patient", async (req, res) => {
     const { passport } = req.query;
     const { full_name, birthday, phone_number, snils } = req.body;
 
@@ -293,9 +310,9 @@ app.patch("/patient", async (req, res) => {
         const result = await pool.query(
             `UPDATE public.patient SET
             ${full_name ? `full_name = '${full_name}'` : ""}
-            ${birthday ? `birthday = '${birthday}'` : ""}
-            ${phone_number ? `phone_number = ${phone_number}` : ""}
-            ${snils ? `snils = ${snils}` : ""}
+            ${birthday ? `, birthday = '${birthday}'` : ""}
+            ${phone_number ? `, phone_number = ${phone_number}` : ""}
+            ${snils ? `, snils = ${snils}` : ""}
             WHERE passport = '${passport}'`
         );
         console.log(result);
@@ -305,7 +322,7 @@ app.patch("/patient", async (req, res) => {
     }
 });
 
-app.patch("/room", async (req, res) => {
+app.patch("/api/room", async (req, res) => {
     const { number } = req.query;
     const { floor_number, features } = req.body;
 
@@ -313,7 +330,7 @@ app.patch("/room", async (req, res) => {
         const result = await pool.query(
             `UPDATE public.room SET
             ${floor_number ? `floor_number = '${floor_number}'` : ""}
-            ${features ? `features = '${features}'` : ""}
+            ${features ? `, features = '${features}'` : ""}
             WHERE number = ${number}`
         );
         console.log(result);
@@ -323,7 +340,7 @@ app.patch("/room", async (req, res) => {
     }
 });
 
-app.patch("/service", async (req, res) => {
+app.patch("/api/service", async (req, res) => {
     const { name } = req.query;
     const { description, price } = req.body;
 
@@ -331,7 +348,7 @@ app.patch("/service", async (req, res) => {
         const result = await pool.query(
             `UPDATE public.service SET
             ${description ? `description = '${description}'` : ""}
-            ${price ? `price = '${price}'` : ""}
+            ${price ? `, price = '${price}' ` : ""}
             WHERE name = '${name}'`
         );
         console.log(result);
@@ -341,7 +358,7 @@ app.patch("/service", async (req, res) => {
     }
 });
 
-app.patch("/visit", async (req, res) => {
+app.patch("/api/visit", async (req, res) => {
     const visit_date = req.query.visit_date;
     const patient_passport = req.query.passport;
     const { duration_in_minutes } = req.body;
