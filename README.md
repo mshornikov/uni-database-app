@@ -2,7 +2,13 @@
 
 ### Начало работы
 
-Запуск проекта:
+Склонируйте репозиторий к себе на машину:
+
+```sh
+git clone https://github.com/mshornikov/uni-database-app.git
+```
+
+Запустите проект:
 
 ```sh
 docker compose up -d
