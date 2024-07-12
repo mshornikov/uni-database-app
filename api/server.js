@@ -1,4 +1,7 @@
-import { Pool } from "pg";
+import pg from "pg";
+import express from "express";
+
+const { Pool } = pg;
 
 const pool = new Pool({
     user: "postgres",
@@ -8,7 +11,6 @@ const pool = new Pool({
     port: 5432,
 });
 
-const express = require("express");
 const app = express();
 app.use(express.json());
 
